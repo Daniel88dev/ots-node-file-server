@@ -1,24 +1,22 @@
-import fs from "fs/promises";
-import path from "path";
-import express from "express";
-import cors from "cors";
-import multer from "multer";
+const fs = require("fs/promises");
+const path = require("path");
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
 
 // Define the base directory for file storage
-const STORAGE_DIR = "./storage";
-
-// Ensure that the storage directory exists
-await fs.mkdir(STORAGE_DIR, { recursive: true });
-
-// Configure multer for handling multipart form-data
-const upload = multer();
+const STORAGE_DIR = path.resolve("storage");
 
 /**
- * Start the HTTP server to handle requests for uploading and serving files.
- *
- * @param {number} port - The port number on which the server listens.
+ * Initialize the server and ensure the storage directory exists.
  */
-function startServer(port) {
+async function init() {
+  // Ensure that the storage directory exists
+  await fs.mkdir(STORAGE_DIR, { recursive: true });
+
+  // Configure multer for handling multipart form-data
+  const upload = multer();
+
   const app = express();
 
   // Middleware setup
@@ -65,8 +63,7 @@ function startServer(port) {
       // Validate required fields
       if (!file || !folder1 || !folder2 || !folder3 || !fileName) {
         return res.status(400).json({
-          message:
-            "Missing required fields (file, folder1, folder2, folder3, fileName).",
+          message: "Missing required fields (file, folder1, folder2, folder3, fileName).",
         });
       }
 
@@ -95,11 +92,14 @@ function startServer(port) {
     }
   });
 
-  // Start the server
-  app.listen(port, "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${port}`);
+  // Bind to the IIS port provided by the IISNode environment
+  const port = process.env.PORT || 8000; // Default to port 3000 if no port is provided
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
   });
 }
 
-// Start the server on port 8000
-startServer(8000);
+// Call the initialization function to start the server
+init().catch((error) => {
+  console.error("Failed to initialize the application:", error);
+});
