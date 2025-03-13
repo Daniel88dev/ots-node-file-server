@@ -7,9 +7,7 @@ const multer = require("multer");
 // Define the base directory for file storage
 const STORAGE_DIR = path.resolve("storage");
 
-/**
- * Initialize the server and ensure the storage directory exists.
- */
+// Initialize the server and ensure the storage directory exists.
 async function init() {
   // Ensure that the storage directory exists
   await fs.mkdir(STORAGE_DIR, { recursive: true });
@@ -24,11 +22,7 @@ async function init() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  /**
-   * Route: Serve a PDF file based on the requested path.
-   * - Uses HTTP GET method.
-   * - Expects the file path in the URL.
-   */
+  // GET Method, to provide pdf file
   app.get("/*", async (req, res) => {
     const pathname = decodeURIComponent(req.path);
     const filePath = path.join(STORAGE_DIR, pathname);
@@ -63,7 +57,8 @@ async function init() {
       // Validate required fields
       if (!file || !folder1 || !folder2 || !folder3 || !fileName) {
         return res.status(400).json({
-          message: "Missing required fields (file, folder1, folder2, folder3, fileName).",
+          message:
+            "Missing required fields (file, folder1, folder2, folder3, fileName).",
         });
       }
 
